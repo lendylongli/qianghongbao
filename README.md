@@ -1,7 +1,7 @@
 #CodeBoy微信抢红包外挂
 
 #### 效果预览
-![](show.gif)
+![](show_min.gif)
 
 ####源码下载地址:[https://github.com/lendylongli/qianghongbao](https://github.com/lendylongli/qianghongbao)
 ####apk下载地址 : [百度云下载 http://pan.baidu.com/s/1jGgjQUq](http://pan.baidu.com/s/1jGgjQUq)
