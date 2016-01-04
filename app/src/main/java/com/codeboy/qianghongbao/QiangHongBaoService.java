@@ -2,8 +2,10 @@ package com.codeboy.qianghongbao;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
@@ -29,6 +31,7 @@ public class QiangHongBaoService extends AccessibilityService {
     /** 红包消息的关键字*/
     static final String HONGBAO_TEXT_KEY = "[微信红包]";
 
+    private boolean isFirstChecked ;
     Handler handler = new Handler();
 
     @Override
@@ -68,6 +71,7 @@ public class QiangHongBaoService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+
         Toast.makeText(this, "连接抢红包服务", Toast.LENGTH_SHORT).show();
     }
 
@@ -90,11 +94,21 @@ public class QiangHongBaoService extends AccessibilityService {
         if(event.getParcelableData() == null || !(event.getParcelableData() instanceof Notification)) {
             return;
         }
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        ComponentName cn1 = am.getRunningTasks(1).get(0).topActivity;
+        Log.d(TAG,"cn1----"+cn1.toString());
         //以下是精华，将微信的通知栏消息打开
         Notification notification = (Notification) event.getParcelableData();
         PendingIntent pendingIntent = notification.contentIntent;
+
+        isFirstChecked = true;
         try {
             pendingIntent.send();
+            ComponentName cn2 = am.getRunningTasks(1).get(0).topActivity;
+            Log.d(TAG,"cn2----"+cn2.toString());
+            if (cn1.equals(cn2)){
+                checkKey2();
+            }
         } catch (PendingIntent.CanceledException e) {
             e.printStackTrace();
         }
@@ -148,7 +162,11 @@ public class QiangHongBaoService extends AccessibilityService {
                 AccessibilityNodeInfo parent = list.get(i).getParent();
                 Log.i(TAG, "-->领取红包:" + parent);
                 if(parent != null) {
-                    parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    if (isFirstChecked){
+                        parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        isFirstChecked=false;
+                    }
+
                     break;
                 }
             }
