@@ -8,13 +8,13 @@ android {
         applicationId "com.codeboy.qianghongbao"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.0.5"
+        versionCode 200
+        versionName "2.0.0"
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles 'proguard-android.txt'
         }
     }
 }
