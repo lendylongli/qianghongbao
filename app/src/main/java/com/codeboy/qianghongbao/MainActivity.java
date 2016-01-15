@@ -1,8 +1,16 @@
 package com.codeboy.qianghongbao;
 
-import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,28 +20,105 @@ import android.widget.Toast;
  *
  * 抢红包主界面
  */
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
+
+    private Dialog mTipsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                open();
-            }
-        });
+        getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).commitAllowingStateLoss();
     }
 
-    private void open() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(QiangHongBaoService.isRunning()) {
+            if(mTipsDialog != null) {
+                mTipsDialog.dismiss();
+            }
+        } else {
+            showOpenAccessibilityServiceDialog();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mTipsDialog = null;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add(0, 0, 0, R.string.open_service_button);
+        item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == 0) {
+            openAccessibilityServiceSettings();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /** 显示未开启辅助服务的对话框*/
+    private void showOpenAccessibilityServiceDialog() {
+        if(mTipsDialog != null && mTipsDialog.isShowing()) {
+            return;
+        }
+        View view = getLayoutInflater().inflate(R.layout.dialog_tips_layout, null);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAccessibilityServiceSettings();
+            }
+        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.open_service_title);
+        builder.setView(view);
+        builder.setPositiveButton(R.string.open_service_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                openAccessibilityServiceSettings();
+            }
+        });
+        mTipsDialog = builder.show();
+    }
+
+    /** 打开辅助服务的设置*/
+    private void openAccessibilityServiceSettings() {
         try {
             Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
-            Toast.makeText(this, "找到[微信抢红包]，然后开启服务即可", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.tips, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static class MainFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            getPreferenceManager().setSharedPreferencesName(Config.PREFERENCE_NAME);
+            addPreferencesFromResource(R.xml.main);
+
+            SwitchPreference switchPreference = (SwitchPreference) findPreference(Config.KEY_ENABLE_QIANG_HONG_BAO);
+            switchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if((Boolean) newValue && !QiangHongBaoService.isRunning()) {
+                        ((MainActivity)getActivity()).showOpenAccessibilityServiceDialog();
+                    }
+                    return true;
+                }
+            });
         }
     }
 }
