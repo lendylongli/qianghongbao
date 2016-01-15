@@ -1,17 +1,3 @@
-/*
- * Project: Laiwang
- * 
- * File Created at 2016-01-15
- * 
- * Copyright 2013 Alibaba.com Corporation Limited.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information of
- * Alibaba Company. ("Confidential Information").  You shall not
- * disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into
- * with Alibaba.com.
- */
 package com.codeboy.qianghongbao;
 
 import android.content.Context;
