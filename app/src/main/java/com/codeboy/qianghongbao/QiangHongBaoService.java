@@ -159,19 +159,21 @@ public class QiangHongBaoService extends AccessibilityService {
             return;
         }
 
-        List<AccessibilityNodeInfo> list;
+        List<AccessibilityNodeInfo> list = null;
         if(getWeixinVersion()<USE_ID_MIN_VERSION) {
             list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_HONGBAO);
-        } else {
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_OPEN_HONGBAO);
         }
 
-        for(AccessibilityNodeInfo n : list) {
-            n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        if(list != null && !list.isEmpty()) {
+            for (AccessibilityNodeInfo n : list) {
+                n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            }
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void checkKey2() {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if(nodeInfo == null) {
@@ -179,19 +181,25 @@ public class QiangHongBaoService extends AccessibilityService {
             return;
         }
 
-        List<AccessibilityNodeInfo> list;
-        if(getWeixinVersion()<USE_ID_MIN_VERSION) {
+        List<AccessibilityNodeInfo> list = null;
+        if (getWeixinVersion() < USE_ID_MIN_VERSION) {
             list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_PICK_UP_HONGBAO);
-        } else {
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_PICK_UP_HONGBAO);
         }
 
-        if(list.isEmpty()) {
+        if(list != null && list.isEmpty()) {
             // 从消息列表查找红包
-            if(getWeixinVersion()<USE_ID_MIN_VERSION) {
+            if (getWeixinVersion() < USE_ID_MIN_VERSION) {
                 list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_LIST_HONGBAO);
-            } else {
+            } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_LIST_HONGBAO);
+            } else {
+                list = null;
+            }
+
+            if(list == null || list.isEmpty()) {
+                return;
             }
 
             for(AccessibilityNodeInfo n : list) {
@@ -199,7 +207,7 @@ public class QiangHongBaoService extends AccessibilityService {
                 n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 break;
             }
-        } else {
+        } else if(list != null) {
             //最新的红包领起
             for(int i = list.size() - 1; i >= 0; i --) {
                 AccessibilityNodeInfo parent = list.get(i).getParent();
@@ -209,19 +217,24 @@ public class QiangHongBaoService extends AccessibilityService {
                         parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         isFirstChecked=false;
                     }
-
                     break;
                 }
             }
         }
     }
 
+    private PackageInfo mWechatPackageInfo = null;
+
     private int getWeixinVersion() {
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(WECHAT_PACKAGENAME, 0);
-            return info.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+        if(mWechatPackageInfo == null) {
+            try {
+                mWechatPackageInfo = getPackageManager().getPackageInfo(WECHAT_PACKAGENAME, 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        if(mWechatPackageInfo != null) {
+            return mWechatPackageInfo.versionCode;
         }
         return 0;
     }
