@@ -31,6 +31,15 @@ public class QiangHongBaoService extends AccessibilityService {
     /** 红包消息的关键字*/
     static final String HONGBAO_TEXT_KEY = "[微信红包]";
 
+    /** 列表红包资源id */
+    private static final String ID_LIST_HONGBAO = "com.tencent.mm:id/cd";
+
+    /** 领取红包资源id */
+    private static final String ID_PICK_UP_HONGBAO = "com.tencent.mm:id/dq";
+
+    /** 点开红包资源id */
+    private static final String ID_OPEN_HONGBAO = "com.tencent.mm:id/b2c";
+
     private boolean isFirstChecked ;
     Handler handler = new Handler();
 
@@ -135,7 +144,7 @@ public class QiangHongBaoService extends AccessibilityService {
             Log.w(TAG, "rootWindow为空");
             return;
         }
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("拆红包");
+        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_OPEN_HONGBAO);
         for(AccessibilityNodeInfo n : list) {
             n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
         }
@@ -148,9 +157,11 @@ public class QiangHongBaoService extends AccessibilityService {
             Log.w(TAG, "rootWindow为空");
             return;
         }
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("领取红包");
+
+        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_PICK_UP_HONGBAO);
         if(list.isEmpty()) {
-            list = nodeInfo.findAccessibilityNodeInfosByText(HONGBAO_TEXT_KEY);
+            // 从消息列表查找红包
+            list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_LIST_HONGBAO);
             for(AccessibilityNodeInfo n : list) {
                 Log.i(TAG, "-->微信红包:" + n);
                 n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
