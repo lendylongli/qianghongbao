@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
         try {
             Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
-            Toast.makeText(this, "找到Codeboy抢红包，然后开启服务即可", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "找到[微信抢红包]，然后开启服务即可", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
         }

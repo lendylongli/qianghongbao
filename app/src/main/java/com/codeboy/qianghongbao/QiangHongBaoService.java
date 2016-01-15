@@ -6,6 +6,8 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
@@ -13,7 +15,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
-
 import java.util.List;
 
 /**
@@ -28,8 +29,30 @@ public class QiangHongBaoService extends AccessibilityService {
 
     /** 微信的包名*/
     static final String WECHAT_PACKAGENAME = "com.tencent.mm";
+
     /** 红包消息的关键字*/
     static final String HONGBAO_TEXT_KEY = "[微信红包]";
+
+    /** 不能再使用文字匹配的最小版本号 */
+    private static final int USE_ID_MIN_VERSION = 700;// 6.3.8 对应code为680,6.3.9对应code为700
+
+    /** 列表红包资源id */
+    private static final String ID_LIST_HONGBAO = "com.tencent.mm:id/cd";
+
+    /** 列表红包资源文字 */
+    private static final String TEXT_LIST_HONGBAO = "[微信红包]";
+
+    /** 领取红包资源id */
+    private static final String ID_PICK_UP_HONGBAO = "com.tencent.mm:id/dq";
+
+    /** 领取红包资源文字 */
+    private static final String TEXT_PICK_UP_HONGBAO = "领取红包";
+
+    /** 点开红包资源id */
+    private static final String ID_OPEN_HONGBAO = "com.tencent.mm:id/b2c";
+
+    /** 点开红包资源文字*/
+    private static final String TEXT_OPEN_HONGBAO = "拆红包";
 
     private boolean isFirstChecked ;
     Handler handler = new Handler();
@@ -135,7 +158,14 @@ public class QiangHongBaoService extends AccessibilityService {
             Log.w(TAG, "rootWindow为空");
             return;
         }
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("拆红包");
+
+        List<AccessibilityNodeInfo> list;
+        if(getWeixinVersion()<USE_ID_MIN_VERSION) {
+            list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_HONGBAO);
+        } else {
+            list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_OPEN_HONGBAO);
+        }
+
         for(AccessibilityNodeInfo n : list) {
             n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
         }
@@ -148,9 +178,22 @@ public class QiangHongBaoService extends AccessibilityService {
             Log.w(TAG, "rootWindow为空");
             return;
         }
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("领取红包");
+
+        List<AccessibilityNodeInfo> list;
+        if(getWeixinVersion()<USE_ID_MIN_VERSION) {
+            list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_PICK_UP_HONGBAO);
+        } else {
+            list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_PICK_UP_HONGBAO);
+        }
+
         if(list.isEmpty()) {
-            list = nodeInfo.findAccessibilityNodeInfosByText(HONGBAO_TEXT_KEY);
+            // 从消息列表查找红包
+            if(getWeixinVersion()<USE_ID_MIN_VERSION) {
+                list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_LIST_HONGBAO);
+            } else {
+                list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_LIST_HONGBAO);
+            }
+
             for(AccessibilityNodeInfo n : list) {
                 Log.i(TAG, "-->微信红包:" + n);
                 n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
@@ -171,6 +214,16 @@ public class QiangHongBaoService extends AccessibilityService {
                 }
             }
         }
+    }
+
+    private int getWeixinVersion() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(WECHAT_PACKAGENAME, 0);
+            return info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }
