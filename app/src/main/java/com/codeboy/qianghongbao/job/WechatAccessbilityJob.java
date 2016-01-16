@@ -18,6 +18,7 @@ import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.codeboy.qianghongbao.BuildConfig;
+import com.codeboy.qianghongbao.Config;
 import com.codeboy.qianghongbao.QiangHongBaoService;
 
 import java.util.List;
@@ -59,6 +60,9 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
     /** 点开红包资源文字*/
     private static final String TEXT_OPEN_HONGBAO = "拆红包";
+
+    /** 点击看看大家的手气*/
+    private static final String TEXT_OPEN_SEE = "看看大家的手气";
 
     private boolean isFirstChecked ;
     private PackageInfo mWechatPackageInfo = null;
@@ -193,10 +197,17 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         }
 
         List<AccessibilityNodeInfo> list = null;
-        if(isEnableUseText()) {
-            list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_HONGBAO);
-        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_OPEN_HONGBAO);
+        int event = getConfig().getWechatAfterOpenHongBaoEvent();
+        if(event == Config.WX_AFTER_OPEN_HONGBAO) { //拆红包
+            if (isEnableUseText()) {
+                list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_HONGBAO);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_OPEN_HONGBAO);
+            }
+        } else if(event == Config.WX_AFTER_OPEN_SEE) { //看一看
+            if(isEnableUseText()) { //低版本才有 看大家手气的功能
+                list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_SEE);
+            }
         }
 
         if(list != null && !list.isEmpty()) {
@@ -261,10 +272,15 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
     /** 是否可以通过使用文本方式进行抢红包*/
     private boolean isEnableUseText() {
+        return getWechatVersion() < USE_ID_MIN_VERSION;
+    }
+
+    /** 获取微信的版本*/
+    private int getWechatVersion() {
         if(mWechatPackageInfo == null) {
-            return true;
+            return 0;
         }
-        return mWechatPackageInfo.versionCode < USE_ID_MIN_VERSION;
+        return mWechatPackageInfo.versionCode;
     }
 
     /** 更新微信包信息*/

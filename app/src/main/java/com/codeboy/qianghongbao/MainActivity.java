@@ -4,9 +4,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -110,8 +110,8 @@ public class MainActivity extends BaseActivity {
             getPreferenceManager().setSharedPreferencesName(Config.PREFERENCE_NAME);
             addPreferencesFromResource(R.xml.main);
 
-            SwitchPreference switchPreference = (SwitchPreference) findPreference(Config.KEY_ENABLE_WECHAT);
-            switchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            //微信红包开关
+            findPreference(Config.KEY_ENABLE_WECHAT).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     if((Boolean) newValue && !QiangHongBaoService.isRunning()) {
@@ -120,6 +120,19 @@ public class MainActivity extends BaseActivity {
                     return true;
                 }
             });
+
+            //打开微信红包后
+            final ListPreference wxAfterOpenPre = (ListPreference) findPreference(Config.KEY_WECHAT_AFTER_OPEN_HONGBAO);
+            wxAfterOpenPre.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    int value = Integer.parseInt(String.valueOf(newValue));
+                    preference.setSummary(wxAfterOpenPre.getEntries()[value]);
+                    return true;
+                }
+            });
+            int value = Integer.parseInt(wxAfterOpenPre.getValue());
+            wxAfterOpenPre.setSummary(wxAfterOpenPre.getEntries()[value]);
         }
     }
 }

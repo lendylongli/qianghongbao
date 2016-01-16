@@ -5,8 +5,14 @@
         <SwitchPreference
             android:defaultValue="true"
             android:title="开启抢微信红包"
-            android:key="KEY_ENABLE_WECHAT">
-
-        </SwitchPreference>
+            android:key="KEY_ENABLE_WECHAT"/>
+        <ListPreference
+            android:title="打开红包后"
+            android:defaultValue="0"
+            android:summary="拆红包"
+            android:key="KEY_WECHAT_AFTER_OPEN_HONGBAO"
+            android:dialogTitle="设置打开红包后要执行的事件"
+            android:entries="@array/wechat_after_open_settings_titles"
+            android:entryValues="@array/wechat_after_open_settings_values"/>
     </PreferenceCategory>
 </PreferenceScreen>
