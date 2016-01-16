@@ -27,6 +27,10 @@ public class QiangHongBaoService extends AccessibilityService {
 
     private static final String TAG = "QiangHongBao";
 
+    private static final Class[] ACCESSBILITY_JOBS= {
+            WechatAccessbilityJob.class,
+    };
+
     private static QiangHongBaoService service;
 
     private Config mConfig;
@@ -38,7 +42,20 @@ public class QiangHongBaoService extends AccessibilityService {
 
         mAccessbilityJobs = new ArrayList<>();
         mConfig = new Config(this);
-        mAccessbilityJobs.add(new WechatAccessbilityJob(this, mConfig));
+
+        //初始化辅助插件工作
+        for(Class clazz : ACCESSBILITY_JOBS) {
+            try {
+                Object object = clazz.newInstance();
+                if(object instanceof AccessbilityJob) {
+                    AccessbilityJob job = (AccessbilityJob) object;
+                    job.onCreateJob(this);
+                    mAccessbilityJobs.add(job);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -83,6 +100,10 @@ public class QiangHongBaoService extends AccessibilityService {
                 }
             }
         }
+    }
+
+    public Config getConfig() {
+        return mConfig;
     }
 
     /**

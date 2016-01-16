@@ -1,6 +1,5 @@
 package com.codeboy.qianghongbao.job;
 
-import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -18,7 +17,8 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.codeboy.qianghongbao.Config;
+import com.codeboy.qianghongbao.BuildConfig;
+import com.codeboy.qianghongbao.QiangHongBaoService;
 
 import java.util.List;
 
@@ -63,8 +63,17 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     private boolean isFirstChecked ;
     private PackageInfo mWechatPackageInfo = null;
 
-    public WechatAccessbilityJob(AccessibilityService service, Config config) {
-        super(service, config);
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //更新安装包信息
+            updatePackageInfo();
+        }
+    };
+
+    @Override
+    public void onCreateJob(QiangHongBaoService service) {
+        super.onCreateJob(service);
 
         updatePackageInfo();
 
@@ -76,14 +85,6 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
         getContext().registerReceiver(broadcastReceiver, filter);
     }
-
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //更新安装包信息
-            updatePackageInfo();
-        }
-    };
 
     @Override
     public void onStopJob() {
@@ -138,8 +139,10 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             return;
         }
         ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-        ComponentName cn1 = am.getRunningTasks(1).get(0).topActivity;
-        Log.d(TAG, "cn1----" + cn1.toString());
+        ComponentName beforeTop = am.getRunningTasks(1).get(0).topActivity;
+        if(BuildConfig.DEBUG) {
+            Log.d(TAG, "beforeTop----" + beforeTop.toString());
+        }
         //以下是精华，将微信的通知栏消息打开
         Notification notification = (Notification) event.getParcelableData();
         PendingIntent pendingIntent = notification.contentIntent;
@@ -147,12 +150,14 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         isFirstChecked = true;
         try {
             pendingIntent.send();
-            ComponentName cn2 = am.getRunningTasks(1).get(0).topActivity;
-            Log.d(TAG, "cn2----" + cn2.toString());
-            if (cn1.equals(cn2)){
+            ComponentName afterTop = am.getRunningTasks(1).get(0).topActivity;
+            if(BuildConfig.DEBUG) {
+                Log.d(TAG, "afterTop----" + afterTop.toString());
+            }
+            if (beforeTop.equals(afterTop)){
                 handleChatListHongBao();
             }
-        } catch (PendingIntent.CanceledException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -176,7 +181,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
      * */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void handleLuckyMoneyReceive() {
-        AccessibilityNodeInfo nodeInfo = mService.getRootInActiveWindow();
+        AccessibilityNodeInfo nodeInfo = getService().getRootInActiveWindow();
         if(nodeInfo == null) {
             Log.w(TAG, "rootWindow为空");
             return;
@@ -201,7 +206,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
      * */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void handleChatListHongBao() {
-        AccessibilityNodeInfo nodeInfo = mService.getRootInActiveWindow();
+        AccessibilityNodeInfo nodeInfo = getService().getRootInActiveWindow();
         if(nodeInfo == null) {
             Log.w(TAG, "rootWindow为空");
             return;

@@ -2,6 +2,8 @@ package com.codeboy.qianghongbao.job;
 
 import android.view.accessibility.AccessibilityEvent;
 
+import com.codeboy.qianghongbao.QiangHongBaoService;
+
 /**
  * <p>Created 16/1/16 上午12:32.</p>
  * <p><a href="mailto:codeboy2013@gmail.com">Email:codeboy2013@gmail.com</a></p>
@@ -11,6 +13,7 @@ import android.view.accessibility.AccessibilityEvent;
  */
 public interface AccessbilityJob {
     String getTargetPackageName();
+    void onCreateJob(QiangHongBaoService service);
     void onReceiveJob(AccessibilityEvent event);
     void onStopJob();
 }
