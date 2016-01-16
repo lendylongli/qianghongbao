@@ -29,6 +29,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).commitAllowingStateLoss();
+
+        QHBApplication.activityStartMain(this);
     }
 
     @Override
