@@ -94,6 +94,11 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     }
 
     @Override
+    public boolean isEnable() {
+        return getConfig().isEnableWechat();
+    }
+
+    @Override
     public String getTargetPackageName() {
         return WECHAT_PACKAGENAME;
     }

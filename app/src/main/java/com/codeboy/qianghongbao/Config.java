@@ -13,7 +13,7 @@ import android.content.SharedPreferences;
 public class Config {
 
     public static final String PREFERENCE_NAME = "config";
-    public static final String KEY_ENABLE_QIANG_HONG_BAO = "KEY_ENABLE_QIANG_HONG_BAO";
+    public static final String KEY_ENABLE_WECHAT = "KEY_ENABLE_WECHAT";
 
     SharedPreferences preferences;
 
@@ -21,7 +21,8 @@ public class Config {
         preferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
     }
 
-    public boolean isEnableQiangHongBao() {
-        return preferences.getBoolean(KEY_ENABLE_QIANG_HONG_BAO, true);
+    /** 是否启动微信抢红包*/
+    public boolean isEnableWechat() {
+        return preferences.getBoolean(KEY_ENABLE_WECHAT, true);
     }
 }

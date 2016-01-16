@@ -16,4 +16,5 @@ public interface AccessbilityJob {
     void onCreateJob(QiangHongBaoService service);
     void onReceiveJob(AccessibilityEvent event);
     void onStopJob();
+    boolean isEnable();
 }

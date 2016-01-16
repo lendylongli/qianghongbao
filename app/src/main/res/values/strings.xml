@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">CodeBoy抢红包</string>
+    <string name="main_name">抢红包</string>
     <string name="accessibility_description">启动抢红包服务，仅支持微信。</string>
     <string name="service_name">CodeBoy抢红包</string>
     <string name="open_service_title">需要开启辅助服务正常使用</string>

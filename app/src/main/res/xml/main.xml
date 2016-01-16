@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="设置">
+    <PreferenceCategory android:title="微信红包设置">
         <SwitchPreference
             android:defaultValue="true"
-            android:title="开启抢红包"
-            android:key="KEY_ENABLE_QIANG_HONG_BAO">
+            android:title="开启抢微信红包"
+            android:key="KEY_ENABLE_WECHAT">
 
         </SwitchPreference>
     </PreferenceCategory>

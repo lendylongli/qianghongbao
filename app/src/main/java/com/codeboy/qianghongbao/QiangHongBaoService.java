@@ -85,9 +85,6 @@ public class QiangHongBaoService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if(!mConfig.isEnableQiangHongBao()) { //没开启，则不处理事件
-            return;
-        }
         if(BuildConfig.DEBUG) {
             Log.d(TAG, "事件--->" + event);
         }
@@ -95,7 +92,7 @@ public class QiangHongBaoService extends AccessibilityService {
         if(mAccessbilityJobs != null && !mAccessbilityJobs.isEmpty()) {
 
             for (AccessbilityJob job : mAccessbilityJobs) {
-                if(pkn.equals(job.getTargetPackageName())) {
+                if(pkn.equals(job.getTargetPackageName()) && job.isEnable()) {
                     job.onReceiveJob(event);
                 }
             }

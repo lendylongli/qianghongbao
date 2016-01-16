@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity {
             getPreferenceManager().setSharedPreferencesName(Config.PREFERENCE_NAME);
             addPreferencesFromResource(R.xml.main);
 
-            SwitchPreference switchPreference = (SwitchPreference) findPreference(Config.KEY_ENABLE_QIANG_HONG_BAO);
+            SwitchPreference switchPreference = (SwitchPreference) findPreference(Config.KEY_ENABLE_WECHAT);
             switchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
