@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
@@ -66,6 +68,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
     private boolean isFirstChecked ;
     private PackageInfo mWechatPackageInfo = null;
+    private Handler mHandler = null;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -211,8 +214,18 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         }
 
         if(list != null && !list.isEmpty()) {
-            for (AccessibilityNodeInfo n : list) {
-                n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            long sDelayTime = getConfig().getWechatOpenDelayTime();
+            for (final AccessibilityNodeInfo n : list) {
+                if(sDelayTime != 0) {
+                    getHandler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        }
+                    }, sDelayTime);
+                } else {
+                    n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                }
             }
         }
     }
@@ -250,7 +263,9 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             }
 
             for(AccessibilityNodeInfo n : list) {
-                Log.i(TAG, "-->微信红包:" + n);
+                if(BuildConfig.DEBUG) {
+                    Log.i(TAG, "-->微信红包:" + n);
+                }
                 n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 break;
             }
@@ -258,7 +273,9 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             //最新的红包领起
             for(int i = list.size() - 1; i >= 0; i --) {
                 AccessibilityNodeInfo parent = list.get(i).getParent();
-                Log.i(TAG, "-->领取红包:" + parent);
+                if(BuildConfig.DEBUG) {
+                    Log.i(TAG, "-->领取红包:" + parent);
+                }
                 if(parent != null) {
                     if (isFirstChecked){
                         parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
@@ -268,6 +285,13 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
                 }
             }
         }
+    }
+
+    private Handler getHandler() {
+        if(mHandler == null) {
+            mHandler = new Handler(Looper.getMainLooper());
+        }
+        return mHandler;
     }
 
     /** 是否可以通过使用文本方式进行抢红包*/

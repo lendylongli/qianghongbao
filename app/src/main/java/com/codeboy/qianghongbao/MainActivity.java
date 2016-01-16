@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -133,6 +134,25 @@ public class MainActivity extends BaseActivity {
             });
             int value = Integer.parseInt(wxAfterOpenPre.getValue());
             wxAfterOpenPre.setSummary(wxAfterOpenPre.getEntries()[value]);
+
+            final EditTextPreference delayEditTextPre = (EditTextPreference) findPreference(Config.KEY_WECHAT_DELAY_TIME);
+            delayEditTextPre.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if("0".equals(String.valueOf(newValue))) {
+                        preference.setSummary("");
+                    } else {
+                        preference.setSummary("已延时" + newValue + "毫秒");
+                    }
+                    return true;
+                }
+            });
+            String delay = delayEditTextPre.getText();
+            if("0".equals(String.valueOf(delay))) {
+                delayEditTextPre.setSummary("");
+            } else {
+                delayEditTextPre.setSummary("已延时" + delay  + "毫秒");
+            }
         }
     }
 }
