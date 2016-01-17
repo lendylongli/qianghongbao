@@ -32,8 +32,9 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle(R.string.app_name);
 
-        getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).commitAllowingStateLoss();
+        getFragmentManager().beginTransaction().add(R.id.container, new MainFragment()).commitAllowingStateLoss();
 
         QHBApplication.activityStartMain(this);
 
