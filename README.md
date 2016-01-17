@@ -141,13 +141,10 @@ feedbackAllMask | 所有以上的反馈
 ![](wechatpay.jpg)
 
 ##关于作者
-英文名:Leon
-
-个人博客:[http://www.happycodeboy.com](http://www.happycodeboy.com)
-
-Email:codeboy2013@gmail.com
-
-QQ:730395591
-
+英文名:Leon<br>
+个人博客:[http://www.happycodeboy.com](http://www.happycodeboy.com)<br>
+Email:codeboy2013@gmail.com<br>
+QQ:730395591<br>
 微信:
+
 ![](wechat.jpg)
