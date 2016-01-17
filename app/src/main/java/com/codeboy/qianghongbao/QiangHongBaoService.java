@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -61,6 +62,7 @@ public class QiangHongBaoService extends AccessibilityService {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "qianghongbao service destory");
         if(mAccessbilityJobs != null && !mAccessbilityJobs.isEmpty()) {
             for (AccessbilityJob job : mAccessbilityJobs) {
                 job.onStopJob();
@@ -69,10 +71,14 @@ public class QiangHongBaoService extends AccessibilityService {
         }
         service = null;
         mAccessbilityJobs = null;
+        //发送广播，已经断开辅助服务
+        Intent intent = new Intent(Config.ACTION_QIANGHONGBAO_SERVICE_DISCONNECT);
+        sendBroadcast(intent);
     }
 
     @Override
     public void onInterrupt() {
+        Log.d(TAG, "qianghongbao service interrupt");
         Toast.makeText(this, "中断抢红包服务", Toast.LENGTH_SHORT).show();
     }
 
@@ -80,6 +86,9 @@ public class QiangHongBaoService extends AccessibilityService {
     protected void onServiceConnected() {
         super.onServiceConnected();
         service = this;
+        //发送广播，已经连接上了
+        Intent intent = new Intent(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT);
+        sendBroadcast(intent);
         Toast.makeText(this, "已连接抢红包服务", Toast.LENGTH_SHORT).show();
     }
 

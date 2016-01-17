@@ -12,6 +12,9 @@ import android.content.SharedPreferences;
  */
 public class Config {
 
+    public static final String ACTION_QIANGHONGBAO_SERVICE_DISCONNECT = "com.codeboy.qianghongbao.ACCESSBILITY_DISCONNECT";
+    public static final String ACTION_QIANGHONGBAO_SERVICE_CONNECT = "com.codeboy.qianghongbao.ACCESSBILITY_CONNECT";
+
     public static final String PREFERENCE_NAME = "config";
     public static final String KEY_ENABLE_WECHAT = "KEY_ENABLE_WECHAT";
     public static final String KEY_WECHAT_AFTER_OPEN_HONGBAO = "KEY_WECHAT_AFTER_OPEN_HONGBAO";

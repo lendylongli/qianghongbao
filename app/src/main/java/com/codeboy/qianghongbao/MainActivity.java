@@ -1,14 +1,18 @@
 package com.codeboy.qianghongbao;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +36,30 @@ public class MainActivity extends BaseActivity {
         getFragmentManager().beginTransaction().replace(R.id.container, new MainFragment()).commitAllowingStateLoss();
 
         QHBApplication.activityStartMain(this);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT);
+        filter.addAction(Config.ACTION_QIANGHONGBAO_SERVICE_DISCONNECT);
+        registerReceiver(qhbConnectReceiver, filter);
     }
+
+    private BroadcastReceiver qhbConnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(isFinishing()) {
+                return;
+            }
+            String action = intent.getAction();
+            Log.d("MainActivity", "receive-->" + action);
+            if(Config.ACTION_QIANGHONGBAO_SERVICE_CONNECT.equals(action)) {
+                if (mTipsDialog != null) {
+                    mTipsDialog.dismiss();
+                }
+            } else if(Config.ACTION_QIANGHONGBAO_SERVICE_DISCONNECT.equals(action)) {
+                showOpenAccessibilityServiceDialog();
+            }
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -49,6 +76,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(qhbConnectReceiver);
+        } catch (Exception e) {}
         mTipsDialog = null;
     }
 
