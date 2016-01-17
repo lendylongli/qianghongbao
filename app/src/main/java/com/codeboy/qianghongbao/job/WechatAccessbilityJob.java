@@ -1,11 +1,9 @@
 package com.codeboy.qianghongbao.job;
 
 import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,7 +14,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.codeboy.qianghongbao.BuildConfig;
@@ -37,34 +34,13 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     private static final String TAG = "WechatAccessbilityJob";
 
     /** 微信的包名*/
-    static final String WECHAT_PACKAGENAME = "com.tencent.mm";
+    private static final String WECHAT_PACKAGENAME = "com.tencent.mm";
 
     /** 红包消息的关键字*/
-    static final String HONGBAO_TEXT_KEY = "[微信红包]";
+    private static final String HONGBAO_TEXT_KEY = "[微信红包]";
 
     /** 不能再使用文字匹配的最小版本号 */
     private static final int USE_ID_MIN_VERSION = 700;// 6.3.8 对应code为680,6.3.9对应code为700
-
-    /** 列表红包资源id */
-    private static final String ID_LIST_HONGBAO = "com.tencent.mm:id/cd";
-
-    /** 列表红包资源文字 */
-    private static final String TEXT_LIST_HONGBAO = "[微信红包]";
-
-    /** 领取红包资源id */
-    private static final String ID_PICK_UP_HONGBAO = "com.tencent.mm:id/dq";
-
-    /** 领取红包资源文字 */
-    private static final String TEXT_PICK_UP_HONGBAO = "领取红包";
-
-    /** 点开红包资源id */
-    private static final String ID_OPEN_HONGBAO = "com.tencent.mm:id/b2c";
-
-    /** 点开红包资源文字*/
-    private static final String TEXT_OPEN_HONGBAO = "拆红包";
-
-    /** 点击看看大家的手气*/
-    private static final String TEXT_OPEN_SEE = "看看大家的手气";
 
     private boolean isFirstChecked ;
     private PackageInfo mWechatPackageInfo = null;
@@ -131,30 +107,13 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         }
     }
 
-    private void sendNotifyEvent(){
-        AccessibilityManager manager= (AccessibilityManager)getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
-        if (!manager.isEnabled()) {
-            return;
-        }
-        AccessibilityEvent event=AccessibilityEvent.obtain(AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED);
-        event.setPackageName(WECHAT_PACKAGENAME);
-        event.setClassName(Notification.class.getName());
-        CharSequence tickerText = HONGBAO_TEXT_KEY;
-        event.getText().add(tickerText);
-        manager.sendAccessibilityEvent(event);
-    }
-
     /** 打开通知栏消息*/
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void openNotify(AccessibilityEvent event) {
         if(event.getParcelableData() == null || !(event.getParcelableData() instanceof Notification)) {
             return;
         }
-        ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-        ComponentName beforeTop = am.getRunningTasks(1).get(0).topActivity;
-        if(BuildConfig.DEBUG) {
-            Log.d(TAG, "beforeTop----" + beforeTop.toString());
-        }
+
         //以下是精华，将微信的通知栏消息打开
         Notification notification = (Notification) event.getParcelableData();
         PendingIntent pendingIntent = notification.contentIntent;
@@ -162,13 +121,6 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         isFirstChecked = true;
         try {
             pendingIntent.send();
-            ComponentName afterTop = am.getRunningTasks(1).get(0).topActivity;
-            if(BuildConfig.DEBUG) {
-                Log.d(TAG, "afterTop----" + afterTop.toString());
-            }
-            if (beforeTop.equals(afterTop)){
-                handleChatListHongBao();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -199,33 +151,55 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             return;
         }
 
+        AccessibilityNodeInfo targetNode = null;
+
         List<AccessibilityNodeInfo> list = null;
         int event = getConfig().getWechatAfterOpenHongBaoEvent();
         if(event == Config.WX_AFTER_OPEN_HONGBAO) { //拆红包
-            if (isEnableUseText()) {
-                list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_HONGBAO);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_OPEN_HONGBAO);
+            if (getWechatVersion() < USE_ID_MIN_VERSION) {
+                list = nodeInfo.findAccessibilityNodeInfosByText("拆红包");
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    list = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b2c");
+                }
+                if(list == null || list.isEmpty()) {
+                    List<AccessibilityNodeInfo> l = nodeInfo.findAccessibilityNodeInfosByText("给你发了一个红包");
+                    if(l != null && !l.isEmpty()) {
+                        AccessibilityNodeInfo p = l.get(0).getParent();
+                        if(p != null) {
+                            for (int i = 0; i < p.getChildCount(); i++) {
+                                AccessibilityNodeInfo node = p.getChild(i);
+                                if("android.widget.Button".equals(node.getClassName())) {
+                                    targetNode = node;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         } else if(event == Config.WX_AFTER_OPEN_SEE) { //看一看
-            if(isEnableUseText()) { //低版本才有 看大家手气的功能
-                list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_OPEN_SEE);
+            if(getWechatVersion() < USE_ID_MIN_VERSION) { //低版本才有 看大家手气的功能
+                list = nodeInfo.findAccessibilityNodeInfosByText("看看大家的手气");
             }
         }
 
         if(list != null && !list.isEmpty()) {
+            targetNode = list.get(0);
+        }
+
+        if(targetNode != null) {
+            final AccessibilityNodeInfo n = targetNode;
             long sDelayTime = getConfig().getWechatOpenDelayTime();
-            for (final AccessibilityNodeInfo n : list) {
-                if(sDelayTime != 0) {
-                    getHandler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        }
-                    }, sDelayTime);
-                } else {
-                    n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                }
+            if(sDelayTime != 0) {
+                getHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    }
+                }, sDelayTime);
+            } else {
+                n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
             }
         }
     }
@@ -241,22 +215,11 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             return;
         }
 
-        List<AccessibilityNodeInfo> list = null;
-        if (isEnableUseText()) {
-            list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_PICK_UP_HONGBAO);
-        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_PICK_UP_HONGBAO);
-        }
+        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("领取红包");
 
         if(list != null && list.isEmpty()) {
             // 从消息列表查找红包
-            if (isEnableUseText()) {
-                list = nodeInfo.findAccessibilityNodeInfosByText(TEXT_LIST_HONGBAO);
-            } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                list = nodeInfo.findAccessibilityNodeInfosByViewId(ID_LIST_HONGBAO);
-            } else {
-                list = null;
-            }
+            list = nodeInfo.findAccessibilityNodeInfosByText("[微信红包]");
 
             if(list == null || list.isEmpty()) {
                 return;
@@ -292,11 +255,6 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             mHandler = new Handler(Looper.getMainLooper());
         }
         return mHandler;
-    }
-
-    /** 是否可以通过使用文本方式进行抢红包*/
-    private boolean isEnableUseText() {
-        return getWechatVersion() < USE_ID_MIN_VERSION;
     }
 
     /** 获取微信的版本*/
