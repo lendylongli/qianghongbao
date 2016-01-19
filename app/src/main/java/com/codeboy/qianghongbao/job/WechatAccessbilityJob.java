@@ -121,9 +121,20 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         isFirstChecked = true;
         try {
             pendingIntent.send();
+
+            getHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e(TAG, "cutomcalled");
+                    handleChatListHongBao();
+                }
+            }, 300);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
