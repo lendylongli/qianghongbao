@@ -131,11 +131,20 @@ feedbackAllMask | 所有以上的反馈
 
 版本归作者所有,转载请注明出处:[http://www.happycodeboy.com/index.php/archives/10/](http://www.happycodeboy.com/index.php/archives/10/)
 
+##打赏作者
+如果你觉得这篇文章或源码对你有帮助又或者你使用Codeboy抢红包包感觉很爽，可以打赏作者作为鼓励哦~
+
+###支付宝
+![](alipay.png)
+
+###微信扫一扫
+![](wechatpay.jpg)
+
 ##关于作者
-英文名:Leon
+英文名:Leon<br>
+个人博客:[http://www.happycodeboy.com](http://www.happycodeboy.com)<br>
+Email:codeboy2013@gmail.com<br>
+QQ:730395591<br>
+微信:
 
-个人博客:[http://www.happycodeboy.com](http://www.happycodeboy.com)
-
-Email:codeboy2013@gmail.com
-
-QQ:730395591
+![](wechat.jpg)
