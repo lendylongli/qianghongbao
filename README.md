@@ -4,7 +4,7 @@
 ![](show_min.gif)
 
 ####源码下载地址:[https://github.com/lendylongli/qianghongbao](https://github.com/lendylongli/qianghongbao)
-####apk下载地址 : [百度云下载 http://pan.baidu.com/s/1jGgjQUq](http://pan.baidu.com/s/1jGgjQUq)
+####apk下载地址 : [百度云下载最新版本](http://t.cn/RbrdRHe)
 
 ##前言
 Codeboy微信抢红包是我在2015年春节过年期间编写的一个开源的兴趣项目，只要是将整个核心抢红包的流程编写出来，至于再复杂的一些操作就没深入研究。当这个项目发布后，也是反应挺大的，很多网友也找到我了与交流，也有做淘宝的人给钱让我去增加一些功能，当然我是拒绝的。
