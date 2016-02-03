@@ -42,6 +42,8 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     /** 不能再使用文字匹配的最小版本号 */
     private static final int USE_ID_MIN_VERSION = 700;// 6.3.8 对应code为680,6.3.9对应code为700
 
+    private static final int WECHAT_6_3_11_VERSION = 720;//6.3.11打开红包的控件ID改变
+
     private boolean isFirstChecked ;
     private PackageInfo mWechatPackageInfo = null;
     private Handler mHandler = null;
@@ -160,7 +162,11 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
                 list = nodeInfo.findAccessibilityNodeInfosByText("拆红包");
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    list = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b2c");
+                    if (getWechatVersion() < WECHAT_6_3_11_VERSION) {
+                        list = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b2c");
+                    } else {
+                        list = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b43");
+                    }
                 }
                 if(list == null || list.isEmpty()) {
                     List<AccessibilityNodeInfo> l = nodeInfo.findAccessibilityNodeInfosByText("给你发了一个红包");
