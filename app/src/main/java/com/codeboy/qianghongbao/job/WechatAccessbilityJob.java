@@ -19,6 +19,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import com.codeboy.qianghongbao.BuildConfig;
 import com.codeboy.qianghongbao.Config;
 import com.codeboy.qianghongbao.QiangHongBaoService;
+import com.codeboy.qianghongbao.util.AccessibilityHelper;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ import java.util.List;
 public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
     private static final String TAG = "WechatAccessbilityJob";
+
+    private static final String BUTTON_CLASS_NAME = "android.widget.Button";
 
     /** 微信的包名*/
     private static final String WECHAT_PACKAGENAME = "com.tencent.mm";
@@ -153,39 +156,50 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
         AccessibilityNodeInfo targetNode = null;
 
-        List<AccessibilityNodeInfo> list = null;
+        int wechatVersion = getWechatVersion();
         int event = getConfig().getWechatAfterOpenHongBaoEvent();
         if(event == Config.WX_AFTER_OPEN_HONGBAO) { //拆红包
-            if (getWechatVersion() < USE_ID_MIN_VERSION) {
-                list = nodeInfo.findAccessibilityNodeInfosByText("拆红包");
+            if (wechatVersion < USE_ID_MIN_VERSION) {
+                targetNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "拆红包");
             } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    list = nodeInfo.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/b2c");
+                String buttonId = null;
+
+                if(wechatVersion == 700) {
+                    buttonId = "com.tencent.mm:id/b2c";
+                } else if(wechatVersion <= 740) {
+                    buttonId = "com.tencent.mm:id/b43";
+                } else {
+                    buttonId = "com.tencent.mm:id/b43";
                 }
-                if(list == null || list.isEmpty()) {
-                    List<AccessibilityNodeInfo> l = nodeInfo.findAccessibilityNodeInfosByText("给你发了一个红包");
-                    if(l != null && !l.isEmpty()) {
-                        AccessibilityNodeInfo p = l.get(0).getParent();
-                        if(p != null) {
-                            for (int i = 0; i < p.getChildCount(); i++) {
-                                AccessibilityNodeInfo node = p.getChild(i);
-                                if("android.widget.Button".equals(node.getClassName())) {
-                                    targetNode = node;
-                                    break;
-                                }
+
+                if(buttonId != null) {
+                    targetNode = AccessibilityHelper.findNodeInfosById(nodeInfo, buttonId);
+
+                }
+
+                if(targetNode == null) {
+                    //分别对应固定金额的红包 拼手气红包
+                    AccessibilityNodeInfo textNode = AccessibilityHelper.findNodeInfosByTexts(nodeInfo, "发了一个红包", "给你发了一个红包", "发了一个红包，金额随机");
+
+                    if(textNode != null) {
+                        for (int i = 0; i < textNode.getChildCount(); i++) {
+                            AccessibilityNodeInfo node = textNode.getChild(i);
+                            if (BUTTON_CLASS_NAME.equals(node.getClassName())) {
+                                targetNode = node;
+                                break;
                             }
                         }
                     }
                 }
+
+                if(targetNode == null) { //通过组件查找
+                    targetNode = AccessibilityHelper.findNodeInfosByClassName(nodeInfo, BUTTON_CLASS_NAME);
+                }
             }
         } else if(event == Config.WX_AFTER_OPEN_SEE) { //看一看
             if(getWechatVersion() < USE_ID_MIN_VERSION) { //低版本才有 看大家手气的功能
-                list = nodeInfo.findAccessibilityNodeInfosByText("看看大家的手气");
+                targetNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "看看大家的手气");
             }
-        }
-
-        if(list != null && !list.isEmpty()) {
-            targetNode = list.get(0);
         }
 
         if(targetNode != null) {
