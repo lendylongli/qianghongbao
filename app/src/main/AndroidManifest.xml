@@ -2,36 +2,81 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codeboy.qianghongbao" >
 
-  <uses-permission android:name="android.permission.GET_TASKS"/>
-  <application
-      android:allowBackup="true"
-      android:icon="@drawable/ic_launcher"
-      android:label="@string/app_name"
-      android:name=".QHBApplication"
-      android:theme="@style/Theme.AppCompat.Light">
-    <activity
-        android:name=".MainActivity"
-        android:label="@string/main_name">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_ADDED" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_CHANGED" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_INSTALL" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REPLACED" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
 
-        <category android:name="android.intent.category.LAUNCHER"/>
-      </intent-filter>
-    </activity>
+    <permission
+        android:name="com.codeboy.qianghongbao.permission.MIPUSH_RECEIVE"
+        android:protectionLevel="signatureOrSystem" />
 
-    <service
-        android:enabled="true"
-        android:exported="true"
-        android:label="@string/service_name"
-        android:name=".QiangHongBaoService"
-        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-      <intent-filter>
-        <action android:name="android.accessibilityservice.AccessibilityService"/>
-      </intent-filter>
-      <meta-data
-          android:name="android.accessibilityservice"
-          android:resource="@xml/qianghongbao_service_config"/>
-    </service>
-  </application>
+    <uses-permission android:name="com.codeboy.qianghongbao.permission.MIPUSH_RECEIVE" />
+
+    <application
+        android:name=".QHBApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher_v2"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AppCompat.Light" >
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/main_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <activity android:name=".WechatSettingsActivity"
+                  android:label="@string/wechat_settings"/>
+
+        <activity android:name=".NotifySettingsActivity"
+                  android:label="@string/notify_settings"/>
+
+        <activity android:name=".AboutMeActivity"
+                  android:label="@string/about_title"/>
+
+        <service
+            android:name=".QiangHongBaoService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/service_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/qianghongbao_service_config" />
+        </service>
+
+        <service android:name=".QHBNotificationService"
+                 android:label="@string/app_name"
+                 android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+
+        </service>
+
+    </application>
 
 </manifest>

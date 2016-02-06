@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
@@ -15,6 +16,7 @@ import com.codeboy.qianghongbao.job.AccessbilityJob;
 import com.codeboy.qianghongbao.job.WechatAccessbilityJob;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,15 +36,15 @@ public class QiangHongBaoService extends AccessibilityService {
 
     private static QiangHongBaoService service;
 
-    private Config mConfig;
     private List<AccessbilityJob> mAccessbilityJobs;
+    private HashMap<String, AccessbilityJob> mPkgAccessbilityJobMap;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mAccessbilityJobs = new ArrayList<>();
-        mConfig = new Config(this);
+        mPkgAccessbilityJobMap = new HashMap<>();
 
         //初始化辅助插件工作
         for(Class clazz : ACCESSBILITY_JOBS) {
@@ -52,6 +54,7 @@ public class QiangHongBaoService extends AccessibilityService {
                     AccessbilityJob job = (AccessbilityJob) object;
                     job.onCreateJob(this);
                     mAccessbilityJobs.add(job);
+                    mPkgAccessbilityJobMap.put(job.getTargetPackageName(), job);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,14 +66,19 @@ public class QiangHongBaoService extends AccessibilityService {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "qianghongbao service destory");
+        if(mPkgAccessbilityJobMap != null) {
+            mPkgAccessbilityJobMap.clear();
+        }
         if(mAccessbilityJobs != null && !mAccessbilityJobs.isEmpty()) {
             for (AccessbilityJob job : mAccessbilityJobs) {
                 job.onStopJob();
             }
             mAccessbilityJobs.clear();
         }
+
         service = null;
         mAccessbilityJobs = null;
+        mPkgAccessbilityJobMap = null;
         //发送广播，已经断开辅助服务
         Intent intent = new Intent(Config.ACTION_QIANGHONGBAO_SERVICE_DISCONNECT);
         sendBroadcast(intent);
@@ -95,11 +103,13 @@ public class QiangHongBaoService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if(BuildConfig.DEBUG) {
-            Log.d(TAG, "事件--->" + event);
+            Log.d(TAG, "事件--->" + event );
         }
         String pkn = String.valueOf(event.getPackageName());
         if(mAccessbilityJobs != null && !mAccessbilityJobs.isEmpty()) {
-
+            if(!getConfig().isAgreement()) {
+                return;
+            }
             for (AccessbilityJob job : mAccessbilityJobs) {
                 if(pkn.equals(job.getTargetPackageName()) && job.isEnable()) {
                     job.onReceiveJob(event);
@@ -109,7 +119,21 @@ public class QiangHongBaoService extends AccessibilityService {
     }
 
     public Config getConfig() {
-        return mConfig;
+        return Config.getConfig(this);
+    }
+
+    /** 接收通知栏事件*/
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public static void handeNotificationPosted(QHBNotificationService notificationService, StatusBarNotification sbn) {
+        if(service == null || service.mPkgAccessbilityJobMap == null) {
+            return;
+        }
+        String pack = sbn.getPackageName();
+        AccessbilityJob job = service.mPkgAccessbilityJobMap.get(pack);
+        if(job == null) {
+            return;
+        }
+        job.onNotificationPosted(notificationService, sbn);
     }
 
     /**

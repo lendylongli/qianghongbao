@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="微信红包设置">
+    <PreferenceCategory
+            android:title="开启抢红包平台">
+
         <SwitchPreference
             android:defaultValue="true"
-            android:title="开启抢微信红包"
+            android:icon="@drawable/settings_ic_wechat"
             android:key="KEY_ENABLE_WECHAT"/>
 
-        <EditTextPreference
-            android:title="设置延迟拆红包/查看手气时间"
-            android:defaultValue="0"
-            android:key="KEY_WECHAT_DELAY_TIME"
-            android:inputType="number"
-            android:dialogTitle="设置延迟时间(毫秒)"
-            android:hint="单位毫秒(1秒=1000毫秒)"/>
+    </PreferenceCategory>
 
-        <ListPreference
-            android:title="打开红包后"
-            android:defaultValue="0"
-            android:summary="拆红包"
-            android:key="KEY_WECHAT_AFTER_OPEN_HONGBAO"
-            android:dialogTitle="设置打开红包后要执行的事件"
-            android:entries="@array/wechat_after_open_settings_titles"
-            android:entryValues="@array/wechat_after_open_settings_values"/>
+    <PreferenceCategory
+        android:title="关于">
+        <Preference
+            android:title="@string/follow_preference_title"
+            android:summary="@string/follow_preference_summary"
+            android:key="KEY_FOLLOW_ME"/>
+
+        <Preference
+            android:title="@string/donate_title"
+            android:summary="@string/donate_summary"
+            android:key="KEY_DONATE_ME"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="平台设置">
+
+        <Preference
+            android:title="微信设置"
+            android:summary="更改抢红包模式，可以防封号"
+            android:key="WECHAT_SETTINGS"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="高级设置">
+        <SwitchPreference
+            android:title="快速监听通知栏"
+            android:summary="闪电模式，抢红包更快更稳定"
+            android:defaultValue="false"
+            android:key="KEY_NOTIFICATION_SERVICE_ENABLE"/>
+
+        <Preference
+            android:title="@string/notify_settings"
+            android:key="NOTIFY_SETTINGS"/>
     </PreferenceCategory>
 </PreferenceScreen>

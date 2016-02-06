@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="wechat_after_open_settings_titles">
-        <item>拆红包</item>
-        <item>看看大家的手气</item>
+        <item>@string/after_open_hongbao</item>
+        <item>@string/after_open_see</item>
+        <item>@string/after_open_none</item>
     </string-array>
+
     <string-array name="wechat_after_open_settings_values">
         <item>0</item>
         <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="wechat_after_get_settings_titles">
+        <item>@string/after_get_back_home</item>
+        <item>@string/after_get_none</item>
+    </string-array>
+
+    <string-array name="wechat_after_get_settings_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="wechat_mode_settings_title">
+        <item>@string/wx_mode_0</item>
+        <item>@string/wx_mode_1</item>
+        <item>@string/wx_mode_2</item>
+        <item>@string/wx_mode_3</item>
+    </string-array>
+
+    <string-array name="wechat_mode_settings_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
     </string-array>
 </resources>

@@ -3,9 +3,43 @@
 
     <string name="app_name">CodeBoy抢红包</string>
     <string name="main_name">抢红包</string>
-    <string name="accessibility_description">启动抢红包服务，仅支持微信。</string>
+    <string name="accessibility_description">启动抢红包服务，支持微信。</string>
     <string name="service_name">CodeBoy抢红包</string>
     <string name="open_service_title">需要开启辅助服务正常使用</string>
     <string name="open_service_button">打开辅助服务</string>
+    <string name="open_notify_service">打开通知栏服务</string>
+    <string name="check_update">检查更新</string>
+    <string name="share">分享</string>
     <string name="tips">找到[CodeBoy抢红包]，然后开启服务即可</string>
+    <string name="qq_settings">QQ设置</string>
+    <string name="wechat_settings">微信设置</string>
+    <string name="notify_settings">红包提醒设置</string>
+
+    <string name="follow_preference_title">关注codeboy微信</string>
+    <string name="follow_preference_summary">了解我最新的开源资讯动态</string>
+
+    <string name="donate_title">打赏开发者</string>
+    <string name="donate_summary">如果这份源码能帮到你，可以打赏我哦</string>
+
+    <string name="after_open_hongbao">拆红包</string>
+    <string name="after_open_see">看看大家的手气(仅支持微信6.3.8版本以下)</string>
+    <string name="after_open_none">静静地看着</string>
+
+    <string name="after_get_back_home">返回桌面</string>
+    <string name="after_get_none">静静地看着</string>
+
+    <string name="wx_mode_0">自动抢</string>
+    <string name="wx_mode_1">抢单聊红包，群聊红包只通知</string>
+    <string name="wx_mode_2">抢群聊红包，单聊红包只通知</string>
+    <string name="wx_mode_3">通知手动抢(防封号)</string>
+
+    <string name="about_title">关于CodeBoy抢红包</string>
+    <string name="about_url">http://www.happycodeboy.com/index.php/archives/10/</string>
+
+    <string name="agreement_title">免责声明</string>
+    <string name="agreement_message">本软件仅供学习使用，完全模拟人工操作，抢红包速度取决于你手机的性能与网络，不涉及任何第三方软件接口，本软件已开放源代码，无病毒、不收集用户隐私信息，禁止使用本软件参与赌博活动。一切因使用“%1$s”造成的任何后果，%1$s概不负责，亦不承担任何法律责任!</string>
+
+    <string name="qr_wx_id">happycodeboy</string>
+    <string name="qr_tips">点击复制微信号:happycodeboy</string>
+
 </resources>

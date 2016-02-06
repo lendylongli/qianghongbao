@@ -2,9 +2,9 @@
 <accessibility-service
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/accessibility_description"
-    android:accessibilityEventTypes="typeNotificationStateChanged|typeWindowStateChanged"
-    android:packageNames="com.tencent.mm"
+    android:accessibilityEventTypes="typeNotificationStateChanged|typeWindowStateChanged|typeWindowContentChanged|typeWindowsChanged"
+    android:packageNames="com.tencent.mm,com.tencent.mobileqq"
     android:accessibilityFeedbackType="feedbackGeneric"
     android:notificationTimeout="100"
-    android:accessibilityFlags=""
+    android:accessibilityFlags="flagDefault"
     android:canRetrieveWindowContent="true"/>

@@ -8,15 +8,22 @@ android {
         applicationId "com.codeboy.qianghongbao"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 201
-        versionName "2.0.1"
+        versionCode 301
+        versionName "3.0.1"
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles 'proguard-android.txt'
         }
     }
+
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {

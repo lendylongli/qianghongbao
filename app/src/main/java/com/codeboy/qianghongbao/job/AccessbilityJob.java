@@ -1,7 +1,9 @@
 package com.codeboy.qianghongbao.job;
 
+import android.service.notification.StatusBarNotification;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.codeboy.qianghongbao.QHBNotificationService;
 import com.codeboy.qianghongbao.QiangHongBaoService;
 
 /**
@@ -16,5 +18,6 @@ public interface AccessbilityJob {
     void onCreateJob(QiangHongBaoService service);
     void onReceiveJob(AccessibilityEvent event);
     void onStopJob();
+    void onNotificationPosted(QHBNotificationService notificationService, StatusBarNotification sbn);
     boolean isEnable();
 }
