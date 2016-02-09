@@ -1,6 +1,7 @@
 package com.codeboy.qianghongbao;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.content.Intent;
 import android.os.Build;
 import android.service.notification.NotificationListenerService;
@@ -34,7 +35,7 @@ public class QHBNotificationService extends NotificationListenerService {
     }
 
     @Override
-    public void onNotificationPosted(StatusBarNotification sbn) {
+    public void onNotificationPosted(final StatusBarNotification sbn) {
         if(BuildConfig.DEBUG) {
             Log.i(TAG, "onNotificationRemoved");
         }
@@ -44,7 +45,17 @@ public class QHBNotificationService extends NotificationListenerService {
         if(!getConfig().isEnableNotificationService()) {
             return;
         }
-        QiangHongBaoService.handeNotificationPosted(this, sbn);
+        QiangHongBaoService.handeNotificationPosted(new IStatusBarNotification() {
+            @Override
+            public String getPackageName() {
+                return sbn.getPackageName();
+            }
+
+            @Override
+            public Notification getNotification() {
+                return sbn.getNotification();
+            }
+        });
     }
 
     @Override

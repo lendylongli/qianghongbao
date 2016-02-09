@@ -13,15 +13,14 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
-import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.codeboy.qianghongbao.BuildConfig;
 import com.codeboy.qianghongbao.Config;
+import com.codeboy.qianghongbao.IStatusBarNotification;
 import com.codeboy.qianghongbao.QHBApplication;
-import com.codeboy.qianghongbao.QHBNotificationService;
 import com.codeboy.qianghongbao.QiangHongBaoService;
 import com.codeboy.qianghongbao.util.AccessibilityHelper;
 import com.codeboy.qianghongbao.util.NotifyHelper;
@@ -95,7 +94,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
-    public void onNotificationPosted(QHBNotificationService notificationService, StatusBarNotification sbn) {
+    public void onNotificationPosted(IStatusBarNotification sbn) {
         Notification notification = sbn.getNotification();
         String ticker = String.valueOf(sbn.getNotification().tickerText);
         if(!ticker.contains(HONGBAO_TEXT_KEY)) {
@@ -127,7 +126,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         final int eventType = event.getEventType();
         //通知栏事件
         if(eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
-            if(QHBNotificationService.isRunning() && getConfig().isEnableNotificationService()) { //开启快速模式，不处理
+            if(QiangHongBaoService.isNotificationServiceRunning() && getConfig().isEnableNotificationService()) { //开启快速模式，不处理
                 return;
             }
             List<CharSequence> texts = event.getText();

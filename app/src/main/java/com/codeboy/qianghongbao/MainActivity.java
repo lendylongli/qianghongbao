@@ -337,7 +337,7 @@ public class MainActivity extends BaseSettingsActivity {
                         return false;
                     }
                     targetNotificationValue = (Boolean)newValue;
-                    if((Boolean) newValue && !QHBNotificationService.isRunning()) {
+                    if((Boolean) newValue && !QiangHongBaoService.isNotificationServiceRunning()) {
                         ((MainActivity)getActivity()).openNotificationServiceSettings();
                         return false;
                     }
@@ -386,10 +386,10 @@ public class MainActivity extends BaseSettingsActivity {
             if(notificationPref == null) {
                 return;
             }
-            if(targetNotificationValue && !notificationPref.isChecked() && QHBNotificationService.isRunning()) {
+            if(targetNotificationValue && !notificationPref.isChecked() && QiangHongBaoService.isNotificationServiceRunning()) {
                 QHBApplication.eventStatistics(getActivity(), "notify_service", String.valueOf(true));
                 notificationPref.setChecked(true);
-            } else if(notificationPref.isChecked() && !QHBNotificationService.isRunning()) {
+            } else if(notificationPref.isChecked() && !QiangHongBaoService.isNotificationServiceRunning()) {
                 notificationPref.setChecked(false);
             }
         }
