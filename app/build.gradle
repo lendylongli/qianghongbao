@@ -8,8 +8,8 @@ android {
         applicationId "com.codeboy.qianghongbao"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 303
-        versionName "3.0.3"
+        versionCode 307
+        versionName "3.0.7"
     }
 
     lintOptions {

@@ -3,17 +3,17 @@
 
     <PreferenceCategory
         android:title="@string/notify_settings">
-        <SwitchPreference
+        <com.codeboy.qianghongbao.widget.CustomSwitchPreference
             android:key="KEY_NOTIFY_SOUND"
             android:title="声音"
             android:defaultValue="true"/>
 
-        <SwitchPreference
+        <com.codeboy.qianghongbao.widget.CustomSwitchPreference
             android:key="KEY_NOTIFY_VIBRATE"
             android:title="震动"
             android:defaultValue="true"/>
 
-        <SwitchPreference
+        <com.codeboy.qianghongbao.widget.CustomSwitchPreference
             android:key="KEY_NOTIFY_NIGHT_ENABLE"
             android:title="夜间免打扰设置"
             android:summary="23:00-07:00"

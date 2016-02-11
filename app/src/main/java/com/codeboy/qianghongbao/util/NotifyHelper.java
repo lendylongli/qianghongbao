@@ -27,7 +27,7 @@ public class NotifyHelper {
     private static PowerManager sPowerManager;
 
     /** 播放声音*/
-    public static void playSound(Context context) {
+    public static void sound(Context context) {
         try {
             MediaPlayer player = MediaPlayer.create(context,
                     Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
@@ -46,7 +46,7 @@ public class NotifyHelper {
     }
 
     /** 是否为夜间*/
-    public static  boolean isNight() {
+    public static  boolean isNightTime() {
         Calendar cal = Calendar.getInstance();
         int hour = cal.get(Calendar.HOUR_OF_DAY);
         if(hour >= 23 || hour < 7) {
@@ -85,26 +85,15 @@ public class NotifyHelper {
         }
     }
 
-    /** 检查并播放通知*/
-    public static void checkAndPlayNotify(Context context, Config config, PendingIntent pendingIntent, boolean fromWechat) {
+    /** 播放效果、声音与震动*/
+    public static void playEffect(Context context, Config config) {
         //夜间模式，不处理
-        if(NotifyHelper.isNight() && config.isNotifyNight()) {
+        if(NotifyHelper.isNightTime() && config.isNotifyNight()) {
             return;
-        }
-
-        boolean lock = isLockScreen(context);
-        if(!lock && fromWechat && config.getWechatMode() == Config.WX_MODE_0) {
-            return;
-        } else if(!lock && !fromWechat) { //非锁屏下
-            return;
-        }
-
-        if(lock) {
-            showNotify(context, pendingIntent);
         }
 
         if(config.isNotifySound()) {
-            playSound(context);
+            sound(context);
         }
         if(config.isNotifyVibrate()) {
             vibrator(context);
@@ -112,7 +101,16 @@ public class NotifyHelper {
     }
 
     /** 显示通知*/
-    public static void showNotify(Context context, PendingIntent pendingIntent) {
+    public static void showNotify(Context context, String title, PendingIntent pendingIntent) {
 
+    }
+
+    /** 执行PendingIntent事件*/
+    public static void send(PendingIntent pendingIntent) {
+        try {
+            pendingIntent.send();
+        } catch (PendingIntent.CanceledException e) {
+            e.printStackTrace();
+        }
     }
 }

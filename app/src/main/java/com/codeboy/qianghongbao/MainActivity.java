@@ -304,7 +304,7 @@ public class MainActivity extends BaseSettingsActivity {
     public static class MainFragment extends BaseSettingsFragment {
 
         private SwitchPreference notificationPref;
-        private boolean targetNotificationValue;
+        private boolean notificationChangeByUser = true;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -323,12 +323,8 @@ public class MainActivity extends BaseSettingsActivity {
                     return true;
                 }
             });
-            if(!UmengConfig.isEnableWechat(getActivity())) {
-                wechatPref.setEnabled(false);
-                wechatPref.setTitle("暂时不能使用");
-            }
 
-            notificationPref = (SwitchPreference) findPreference(Config.KEY_NOTIFICATION_SERVICE_ENABLE);
+            notificationPref = (SwitchPreference) findPreference("KEY_NOTIFICATION_SERVICE_TEMP_ENABLE");
             notificationPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -336,8 +332,17 @@ public class MainActivity extends BaseSettingsActivity {
                         Toast.makeText(getActivity(), "该功能只支持安卓4.3以上的系统", Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    targetNotificationValue = (Boolean)newValue;
-                    if((Boolean) newValue && !QiangHongBaoService.isNotificationServiceRunning()) {
+
+                    if(!notificationChangeByUser) {
+                        notificationChangeByUser = true;
+                        return true;
+                    }
+
+                    boolean enalbe = (boolean) newValue;
+
+                    Config.getConfig(getActivity()).setNotificationServiceEnable(enalbe);
+
+                    if(enalbe && !QiangHongBaoService.isNotificationServiceRunning()) {
                         ((MainActivity)getActivity()).openNotificationServiceSettings();
                         return false;
                     }
@@ -346,23 +351,29 @@ public class MainActivity extends BaseSettingsActivity {
                 }
             });
 
-            findPreference("KEY_FOLLOW_ME").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    ((MainActivity)getActivity()).showQrDialog();
-                    QHBApplication.eventStatistics(getActivity(), "about_author");
-                    return true;
-                }
-            });
+            Preference preference = findPreference("KEY_FOLLOW_ME");
+            if(preference != null) {
+                preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        ((MainActivity) getActivity()).showQrDialog();
+                        QHBApplication.eventStatistics(getActivity(), "about_author");
+                        return true;
+                    }
+                });
+            }
 
-            findPreference("KEY_DONATE_ME").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    ((MainActivity)getActivity()).showDonateDialog();
-                    QHBApplication.eventStatistics(getActivity(), "donate");
-                    return true;
-                }
-            });
+            preference = findPreference("KEY_DONATE_ME");
+            if(preference != null) {
+                preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        ((MainActivity) getActivity()).showDonateDialog();
+                        QHBApplication.eventStatistics(getActivity(), "donate");
+                        return true;
+                    }
+                });
+            }
 
             findPreference("WECHAT_SETTINGS").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -379,6 +390,7 @@ public class MainActivity extends BaseSettingsActivity {
                     return true;
                 }
             });
+
         }
 
         /** 更新快速读取通知的设置*/
@@ -386,10 +398,14 @@ public class MainActivity extends BaseSettingsActivity {
             if(notificationPref == null) {
                 return;
             }
-            if(targetNotificationValue && !notificationPref.isChecked() && QiangHongBaoService.isNotificationServiceRunning()) {
+            boolean running = QiangHongBaoService.isNotificationServiceRunning();
+            boolean enable = Config.getConfig(getActivity()).isEnableNotificationService();
+            if( enable && running && !notificationPref.isChecked()) {
                 QHBApplication.eventStatistics(getActivity(), "notify_service", String.valueOf(true));
+                notificationChangeByUser = false;
                 notificationPref.setChecked(true);
-            } else if(notificationPref.isChecked() && !QiangHongBaoService.isNotificationServiceRunning()) {
+            } else if((!enable || !running) && notificationPref.isChecked()) {
+                notificationChangeByUser = false;
                 notificationPref.setChecked(false);
             }
         }

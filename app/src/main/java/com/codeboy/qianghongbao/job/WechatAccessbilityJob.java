@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -95,20 +94,9 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public void onNotificationPosted(IStatusBarNotification sbn) {
-        Notification notification = sbn.getNotification();
-        String ticker = String.valueOf(sbn.getNotification().tickerText);
-        if(!ticker.contains(HONGBAO_TEXT_KEY)) {
-            return;
-        }
-        try {
-            PendingIntent pendingIntent = notification.contentIntent;
-            if(!NotifyHelper.isLockScreen(getContext())) {
-                pendingIntent.send();
-            }
-            NotifyHelper.checkAndPlayNotify(getContext(), getConfig(), pendingIntent, true);
-        } catch (PendingIntent.CanceledException e) {
-            e.printStackTrace();
-        }
+        Notification nf = sbn.getNotification();
+        String text = String.valueOf(sbn.getNotification().tickerText);
+        notificationEvent(text, nf);
     }
 
     @Override
@@ -131,13 +119,9 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
             }
             List<CharSequence> texts = event.getText();
             if(!texts.isEmpty()) {
-                for(CharSequence t : texts) {
-                    String text = String.valueOf(t);
-                    if(text.contains(HONGBAO_TEXT_KEY)) {
-                        openNotify(event);
-                        break;
-                    }
-                }
+                String text = String.valueOf(texts.get(0));
+                Notification nf = (Notification) event.getParcelableData();
+                notificationEvent(text, nf);
             }
         } else if(eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             openHongBao(event);
@@ -203,25 +187,35 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         return false;
     }
 
+    /** 通知栏事件*/
+    private void notificationEvent(String ticker, Notification nf) {
+        String text = ticker;
+        int index = text.indexOf(":");
+        if(index != -1) {
+            text = text.substring(index + 1);
+        }
+        text = text.trim();
+        if(text.contains(HONGBAO_TEXT_KEY)) { //红包消息
+            newHongBaoNotification(nf);
+        }
+    }
+
     /** 打开通知栏消息*/
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void openNotify(AccessibilityEvent event) {
-        Parcelable data = event.getParcelableData();
-        if(data == null || !(data instanceof Notification)) {
-            return;
+    private void newHongBaoNotification(Notification notification) {
+        isReceivingHongbao = true;
+        //以下是精华，将微信的通知栏消息打开
+        PendingIntent pendingIntent = notification.contentIntent;
+        boolean lock = NotifyHelper.isLockScreen(getContext());
+
+        if(!lock) {
+            NotifyHelper.send(pendingIntent);
+        } else {
+            NotifyHelper.showNotify(getContext(), String.valueOf(notification.tickerText), pendingIntent);
         }
 
-        isReceivingHongbao = true;
-        try {
-            //以下是精华，将微信的通知栏消息打开
-            Notification notification = (Notification) data;
-            PendingIntent pendingIntent = notification.contentIntent;
-            if(!NotifyHelper.isLockScreen(getContext())) {
-                pendingIntent.send();
-            }
-            NotifyHelper.checkAndPlayNotify(getContext(), getConfig(), pendingIntent, true);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(lock || getConfig().getWechatMode() != Config.WX_MODE_0) {
+            NotifyHelper.playEffect(getContext(), getConfig());
         }
     }
 
@@ -273,7 +267,6 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
                 if(buttonId != null) {
                     targetNode = AccessibilityHelper.findNodeInfosById(nodeInfo, buttonId);
-
                 }
 
                 if(targetNode == null) {

@@ -4,8 +4,9 @@
     <PreferenceCategory
             android:title="开启抢红包平台">
 
-        <SwitchPreference
+        <com.codeboy.qianghongbao.widget.CustomSwitchPreference
             android:defaultValue="true"
+            android:title="微信"
             android:icon="@drawable/settings_ic_wechat"
             android:key="KEY_ENABLE_WECHAT"/>
 
@@ -35,11 +36,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="高级设置">
-        <SwitchPreference
+        <com.codeboy.qianghongbao.widget.CustomSwitchPreference
             android:title="快速监听通知栏"
             android:summary="闪电模式，抢红包更快更稳定"
             android:defaultValue="false"
-            android:key="KEY_NOTIFICATION_SERVICE_ENABLE"/>
+            android:key="KEY_NOTIFICATION_SERVICE_TEMP_ENABLE"/>
 
         <Preference
             android:title="@string/notify_settings"

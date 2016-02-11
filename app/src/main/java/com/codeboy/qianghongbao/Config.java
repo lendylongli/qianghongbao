@@ -112,6 +112,10 @@ public class Config {
         return preferences.getBoolean(KEY_NOTIFICATION_SERVICE_ENABLE, false);
     }
 
+    public void setNotificationServiceEnable(boolean enable) {
+        preferences.edit().putBoolean(KEY_NOTIFICATION_SERVICE_ENABLE, enable).apply();
+    }
+
     /** 是否开启声音*/
     public boolean isNotifySound() {
         return preferences.getBoolean(KEY_NOTIFY_SOUND, true);
