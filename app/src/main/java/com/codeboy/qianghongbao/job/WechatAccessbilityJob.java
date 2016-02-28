@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -114,14 +115,17 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         final int eventType = event.getEventType();
         //通知栏事件
         if(eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
+            Parcelable data = event.getParcelableData();
+            if(data == null || !(data instanceof Notification)) {
+                return;
+            }
             if(QiangHongBaoService.isNotificationServiceRunning() && getConfig().isEnableNotificationService()) { //开启快速模式，不处理
                 return;
             }
             List<CharSequence> texts = event.getText();
             if(!texts.isEmpty()) {
                 String text = String.valueOf(texts.get(0));
-                Notification nf = (Notification) event.getParcelableData();
-                notificationEvent(text, nf);
+                notificationEvent(text, (Notification) data);
             }
         } else if(eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             openHongBao(event);
