@@ -148,6 +148,3 @@ feedbackAllMask | 所有以上的反馈
 英文名:Leon<br>
 个人博客:[http://www.happycodeboy.com](http://www.happycodeboy.com)<br>
 Email:codeboy2013@gmail.com<br>
-微信:
-
-![](wechat.jpg)
