@@ -1,6 +1,6 @@
 #CodeBoy微信抢红包外挂
 
-#### 效果预览
+#### 效果预览 撒的发生
 ![](show_min.gif)
 
 ####源码下载地址:[https://github.com/lendylongli/qianghongbao](https://github.com/lendylongli/qianghongbao)
